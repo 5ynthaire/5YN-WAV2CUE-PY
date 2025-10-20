@@ -1,0 +1,5 @@
+GiantWaveFile,0:20:17.550
+---
+Track01,0:06:02
+Track02,0:04:18
+Track03,0:09:58

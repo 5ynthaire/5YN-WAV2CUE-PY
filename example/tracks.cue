@@ -1,0 +1,18 @@
+REM GENRE AudioCD
+REM DATE 2025
+TITLE Album_Title
+PERFORMER Artist_Name
+FILE "GiantWaveFile.wav" WAVE
+
+  TRACK 01 AUDIO
+    TITLE "Track01"
+    INDEX 01 00:06:01.850
+
+  TRACK 02 AUDIO
+    TITLE "Track02"
+    INDEX 01 00:10:19.700
+
+  TRACK 03 AUDIO
+    TITLE "Track03"
+    INDEX 01 00:20:17.550
+
