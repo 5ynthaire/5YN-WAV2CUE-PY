@@ -16,8 +16,9 @@ This is a Python script to assist splitting a single wav file into segments. It 
 Python 3.6+ (uses datetime.timedelta)
 
 **Command Line Switches**
---cumulative: Use timestamp-based input file
---labels : Generate labels.txt for Audacity workflows
+
+- `--cumulative`: Use timestamp-based input file
+- `--labels` : Generate labels.txt for Audacity workflows
 
 **Example: Generate tracks.cue in Duration mode (default)**
 >python wav_cue.py timings.txt
@@ -36,7 +37,7 @@ Python 3.6+ (uses datetime.timedelta)
 ## Input File Examples
 
 **Duration mode format**
-Input file requires total length of wav file on first line, followed by a triple hyphen on new line, then duration and track labels in CSV format. Track durations support three decimal digits, but if none, the script will assume .000:
+Input file requires total length of wav file on first line, followed by a triple hyphen on new line, then duration and track labels in CSV format. Track durations support three decimal second digits, but if none, the script will assume .000:
 
 ```
 GiantWaveFile,0:20:17.550
@@ -47,7 +48,7 @@ GiantWaveFile,0:20:17.550
 ```
 
 **Cumulative mode format**
-Total length of wav file on first line, followed by a triple hyphen on new line, then timestamp of the track start position and track labels in CSV format.
+Total length of wav file on first line, followed by a triple hyphen on new line, then timestamp of the track start position and track labels in CSV format. Timestamps support three decimal second digits, but if none, the script will assume .000:
 ```
 GiantWaveFile,0:20:17.550
 ---
