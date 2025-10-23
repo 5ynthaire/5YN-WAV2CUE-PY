@@ -1,5 +1,4 @@
 import sys
-import re
 from datetime import timedelta
 import argparse
 
@@ -7,10 +6,8 @@ def parse_time_to_seconds(time_str):
     time_str = time_str.strip().rstrip('s')
     if '.' in time_str:
         minutes_seconds, milliseconds = time_str.split('.')
-        # Fix: Ensure exactly 3 digits and proper float conversion with rounding
-        ms_part = milliseconds.ljust(3, '0')[:3]  # Max 3 digits
-        ms_float = float('0.' + ms_part)
-        ms = round(ms_float * 1000)  # Round to nearest millisecond
+        ms_part = milliseconds.ljust(3, '0')[:3]
+        ms = round(float('0.' + ms_part) * 1000)
     else:
         minutes_seconds = time_str
         ms = 0
@@ -19,20 +16,19 @@ def parse_time_to_seconds(time_str):
     if len(parts) == 3:
         h, m, s = map(int, parts)
     elif len(parts) == 2:
-        h, m = 0, *map(int, parts)  # Fix: Use * unpacking
-        s = 0
+        h = 0
+        m, s = map(int, parts)
     else:
         raise ValueError("Invalid time format")
     
-    total_seconds = h * 3600 + m * 60 + s + ms / 1000.0
-    return total_seconds
+    return h * 3600 + m * 60 + s + ms / 1000.0
 
 def seconds_to_time(seconds):
     td = timedelta(seconds=seconds)
     hours = int(td.total_seconds() // 3600)
     minutes = int((td.total_seconds() % 3600) // 60)
     secs = td.total_seconds() % 60
-    ms = int(round((secs - int(secs)) * 1000))  # Round milliseconds
+    ms = int(round((secs - int(secs)) * 1000))
     return f"{hours:02d}:{minutes:02d}:{int(secs):02d}.{ms:03d}"
 
 def format_seconds_to_label(seconds):
@@ -81,8 +77,8 @@ def read_input_file(filename):
         
         track_data = []
         for track_line in tracks:
-            name, duration = track_line.split(',', 1)
-            track_duration = parse_time_to_seconds(duration.strip())
+            t_str, name = track_line.split(',', 1)
+            track_duration = parse_time_to_seconds(t_str.strip())
             track_data.append((name.strip(), track_duration))
         
         return base_name, base_duration, track_data
@@ -90,9 +86,32 @@ def read_input_file(filename):
         print("Error: Invalid line format in input file")
         sys.exit(1)
 
-def calculate_boundaries(base_duration, track_data):
+def calculate_boundaries(base_duration, track_data, cumulative_mode):
     track_count = len(track_data)
-    total_track_duration = sum(duration for _, duration in track_data)
+    
+    if cumulative_mode:
+        starts = [t for _, t in track_data]
+        if not starts:
+            print("Error: No tracks provided")
+            sys.exit(1)
+        if starts[0] != 0.0:
+            print("Error: First track must start at 00:00:00.000")
+            sys.exit(1)
+        for i in range(1, len(starts)):
+            if starts[i] <= starts[i-1]:
+                print("Error: Track starts must be strictly increasing")
+                sys.exit(1)
+        if starts[-1] > base_duration:
+            print(f"Error: Last track start {seconds_to_time(starts[-1])} exceeds file duration {seconds_to_time(base_duration)}")
+            sys.exit(1)
+        boundaries = starts + [base_duration]
+        total_track_duration = base_duration
+        adjustment_per_track = 0.0
+        gap = 0.0
+        return boundaries, total_track_duration, adjustment_per_track, gap, track_count
+    
+    # Duration mode
+    total_track_duration = sum(t for _, t in track_data)
     gap = abs(base_duration - total_track_duration)
     threshold_green = 0.5 * track_count
     threshold_red = 1.0 * track_count
@@ -112,11 +131,10 @@ def calculate_boundaries(base_duration, track_data):
     cumulative = 0.0
     for i, (_, duration) in enumerate(track_data):
         cumulative += duration + adjustment_per_track
-        # Force final boundary to exactly match base_duration
         if i == len(track_data) - 1:
             boundaries.append(base_duration)
         else:
-            boundaries.append(cumulative)
+            boundaries.append(min(cumulative, base_duration))
     
     return boundaries, total_track_duration, adjustment_per_track, gap, track_count
 
@@ -125,7 +143,7 @@ def write_labels_file(boundaries, track_data):
     with open(filename, 'w', encoding='utf-8') as f:
         for i, (name, _) in enumerate(track_data):
             start = boundaries[i]
-            end = boundaries[i + 1]  # This will be base_duration for final track
+            end = boundaries[i + 1]
             f.write(f"{format_seconds_to_label(start)}\t{format_seconds_to_label(end)}\t{name}\n")
     return filename
 
@@ -140,7 +158,7 @@ def write_cue_file(boundaries, track_data, base_name):
         f.write(f'FILE "{wav_filename}" WAVE\n\n')
         
         for i, (name, _) in enumerate(track_data, 1):
-            start_time = seconds_to_time(boundaries[i])
+            start_time = seconds_to_time(boundaries[i-1])
             f.write(f'  TRACK {i:02d} AUDIO\n')
             f.write(f'    TITLE "{name}"\n')
             f.write(f'    INDEX 01 {start_time}\n\n')
@@ -150,30 +168,35 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file', nargs='?', help='Input file with track timings')
     parser.add_argument('--labels', action='store_true', help='Generate labels.txt (default: tracks.cue)')
+    parser.add_argument('--cumulative', action='store_true', help='Use cumulative start times')
     args = parser.parse_args()
     
     if not args.input_file:
-        print("Usage: python wav_cue.py [input.txt | --labels input.txt]")
+        print("Usage: python wav_cue.py [input.txt | --cumulative input.txt | --labels input.txt]")
         sys.exit(1)
     
     generate_labels = args.labels
+    cumulative_mode = args.cumulative
     
     base_name, base_duration, track_data = read_input_file(args.input_file)
-    boundaries, track_total, adjustment_per_track, gap, track_count = calculate_boundaries(base_duration, track_data)
+    boundaries, track_total, adjustment_per_track, gap, track_count = calculate_boundaries(base_duration, track_data, cumulative_mode)
     
     if generate_labels:
         filename = write_labels_file(boundaries, track_data)
     else:
         filename = write_cue_file(boundaries, track_data, base_name)
     
+    mode_str = "Cumulative" if cumulative_mode else "Duration"
+    print(f"{mode_str} mode")
     print(f"{base_name} duration: {seconds_to_time(base_duration)}")
     print(f"Tracks sum: {seconds_to_time(track_total)}")
     print(f"Total difference: {gap:.3f}s")
     print(f"Track count: {track_count}")
     print("")
-    print("Rounding error distribution summary:")
-    print(f"  Adjustment per track: {adjustment_per_track:+.3f}s")
-    print(f"  Total adjustment: {adjustment_per_track * track_count:+.3f}s")
+    if not cumulative_mode:
+        print("Rounding error distribution summary:")
+        print(f"  Adjustment per track: {adjustment_per_track:+.3f}s")
+        print(f"  Total adjustment: {adjustment_per_track * track_count:+.3f}s")
     print(f"Generated: {filename}")
     print("")
 
