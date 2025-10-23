@@ -21,13 +21,13 @@ Python 3.6+ (uses datetime.timedelta)
 - `--labels` : Generate labels.txt for Audacity workflows
 
 **Example: Generate tracks.cue in Duration Mode (default)**
->python wav_cue.py timings.txt
+`python wav_cue.py timings.txt`
 
 **Example: Generate labels.txt in Duration Mode (default)**
->python wav_cue.py --labels timings.txt
+`python wav_cue.py --labels timings.txt`
 
 **Example: Generate labels.txt from Cumulative Mode (--cumulative)**
->python wav_cue.py --cumulative --labels timings_cumulative.txt
+`python wav_cue.py --cumulative --labels timings_cumulative.txt`
 
 ## Compatibility
 
