@@ -62,7 +62,7 @@ GiantWaveFile,0:20:17.550
 
 ## Output Examples
 
->python wav_cue.py timings.txt
+`python wav_cue.py timings.txt`
 
 ```
 REM GENRE AudioCD
@@ -84,15 +84,8 @@ FILE "GiantWaveFile.wav" WAVE
     INDEX 01 00:10:19.700
 ```
 
->python wav_cue.py --labels timings.txt
+`python wav_cue.py --cumulative --labels timings_cumulative.txt`
 
-```
-0.000	361.850	Track01
-361.850	619.700	Track02
-619.700	1217.550	Track03
-```
-
->python wav_cue.py --cumulative --labels timings_cumulative.txt
 ```
 0.000	362.000	Track01
 362.000	620.000	Track02
