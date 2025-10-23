@@ -6,7 +6,7 @@ This is a Python script to assist splitting a single wav file into segments. It 
 
 **Notes**
 - The script does not read or write wav files—It is for converting timestamp data between simple hh:mm:ss track duration or timestamp based formats to tool-friendly formats that use total time elapsed.
-- Two modes: Duration mode (default) for track duration-based input files, and Cumulative mode (--cumulative) for timestamp-based input files.
+- Two modes: Duration Mode (default) for track duration-based input files, and Cumulative Mode (--cumulative) for timestamp-based input files.
 - The author has no affiliation with the Audacity project.
 
 ## Usage
@@ -20,13 +20,13 @@ Python 3.6+ (uses datetime.timedelta)
 - `--cumulative`: Use timestamp-based input file
 - `--labels` : Generate labels.txt for Audacity workflows
 
-**Example: Generate tracks.cue in Duration mode (default)**
+**Example: Generate tracks.cue in Duration Mode (default)**
 >python wav_cue.py timings.txt
 
-**Example: Generate labels.txt in Duration mode (default)**
+**Example: Generate labels.txt in Duration Mode (default)**
 >python wav_cue.py --labels timings.txt
 
-**Example: Generate labels.txt from Cumulative mode (--cumulative)**
+**Example: Generate labels.txt from Cumulative Mode (--cumulative)**
 >python wav_cue.py --cumulative --labels timings_cumulative.txt
 
 ## Compatibility
@@ -36,7 +36,7 @@ Python 3.6+ (uses datetime.timedelta)
 
 ## Input File Examples
 
-**Duration mode format**
+**Duration Mode format**
 Input file requires total length of wav file on first line, followed by a triple hyphen on new line, then duration and track labels in CSV format. Track durations support three decimal second digits, but if none, the script will assume .000:
 
 ```
@@ -47,7 +47,7 @@ GiantWaveFile,0:20:17.550
 0:09:58,Track03
 ```
 
-**Cumulative mode format**
+**Cumulative Mode format**
 Total length of wav file on first line, followed by a triple hyphen on new line, then timestamp of the track start position and track labels in CSV format. Timestamps support three decimal second digits, but if none, the script will assume .000:
 ```
 GiantWaveFile,0:20:17.550
@@ -57,7 +57,7 @@ GiantWaveFile,0:20:17.550
 0:10:20,Track03
 ```
 
-## Output Example
+## Output Examples
 
 >python wav_cue.py timings.txt
 
@@ -89,16 +89,16 @@ FILE "GiantWaveFile.wav" WAVE
 619.700	1217.550	Track03
 ```
 
->>python wav_cue.py --cumulative --labels timings_cumulative.txt
+>python wav_cue.py --cumulative --labels timings_cumulative.txt
 ```
 0.000	362.000	Track01
 362.000	620.000	Track02
 620.000	1217.550	Track03
 ```
 
-## Console Output Example
+## Console Output Examples
 
-**Duration mode, CUE**
+**Duration Mode, CUE**
 ```
 Duration mode
 GiantWaveFile duration: 00:20:17.550
@@ -112,7 +112,7 @@ Rounding error distribution summary:
 Generated: tracks.cue
 ```
 
-**Cumulative mode. labels.txt**
+**Cumulative Mode, labels.txt**
 ```
 Cumulative mode
 GiantWaveFile duration: 00:20:17.550
@@ -127,7 +127,7 @@ Generated: labels.txt
 
 View source: [wav_cue.py](wav_cue.py)
 
-## Rounding Error Handling in Track Duration-Based Workflows
+## Rounding Error Handling in Duration mode
 
 Track durations typically have rounding errors and will result in a gap with wav file length. To mitigate the gap, the script will distribute it across tracks.
 
