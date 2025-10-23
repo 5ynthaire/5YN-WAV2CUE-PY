@@ -150,4 +150,4 @@ This Python script is released under the [MIT License](LICENSE).
 **X**: [@5ynthaire](https://x.com/5ynthaire)  
 **GitHub**: [https://github.com/5ynthaire](https://github.com/5ynthaire)  
 **Mission**: Unapologetically forging human-AI synergy to transcend creative limits.  
-**Attribution**: Created with Grok 3 by xAI (no affiliation).
+**Attribution**: Created with Grok by xAI (no affiliation).
