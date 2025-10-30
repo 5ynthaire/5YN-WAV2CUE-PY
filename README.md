@@ -1,4 +1,7 @@
-# Single Wave File to CUE/Labels Splitter Py Script
+# Single Wave File to CUE/Labels Splitter Py Script & Standalone Binary
+
+## Standalone Binary (No Python Required)
+[![Latest Release](https://img.shields.io/github/v/release/5ynthaire/5YN-WAV2CUE-PY?label=Download%20App)](https://github.com/5ynthaire/5YN-WAV2CUE-PY/releases/latest)
 
 ## Purpose
 
